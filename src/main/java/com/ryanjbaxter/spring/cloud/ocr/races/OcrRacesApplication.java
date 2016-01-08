@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.amazonaws.util.json.JSONObject;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 
@@ -31,13 +32,29 @@ public class OcrRacesApplication implements CommandLineRunner {
 	 private ParticipantsBean participantsBean;
 
     private static List<Race> races = new ArrayList<Race>();
+    private static List<Demo> demo = new ArrayList<Demo>();
     public static void main(String[] args) {
         SpringApplication.run(OcrRacesApplication.class, args);
     }
     @Override
     public void run(String... arg0) throws Exception {
-        races.add(new Race("Spartan Beast", "123", "MA", "Boston"));
-        races.add(new Race("Tough Mudder RI", "456", "RI", "Providence"));
+    	System.out.println("Hello World");
+    	String vcap=System.getenv("VCAP_APPLICATION");
+    	
+    	if(vcap != null)
+    	{
+    		JSONObject  json=new JSONObject(vcap);
+    		String instance_id=(String) json.get("instance_id");
+    		//String instance_id=(String) vcap.get();
+    		//String instance_index=(String) vcap.get("instance_id");
+    		demo.add(new Demo(instance_id));
+    		//demo.add(new Demo(instance_index));
+    		
+    	}
+    	demo.add(new Demo("Hello ALM Team"));
+//        races.add(new Race("Spartan Beast", "123", "MA", "Boston"));
+//        races.add(new Race("Tough Mudder RI", "456", "RI", "Providence"));
+//        races.add(new Race("Rajiv", "346", "ALM", "Pune"));
     }
 
 	  
@@ -52,16 +69,39 @@ public class OcrRacesApplication implements CommandLineRunner {
         }
         return returnRaces;
     }
-    @RequestMapping("/")
+ /*   @RequestMapping("/")
     public List<Race> getRaces() {
         return races;
+    }*/
+    
+/*##############################################
+  //New CODE FROM HERE
+   */
+    @RequestMapping("/")
+    public List<Demo> getRaces() {
+        return demo;
+    }
+    class Demo
+    {
+    private String Message;
+
+	public Demo(String name) {
+		super();
+		this.Message = name;
+	}
+
+	public String getMessage() {
+		return Message;
+	}
+
+	public void setName(String name) {
+		this.Message = name;
+	}
+    
+    
     }
     
-    
-//    @RequestMapping("/races")
-//    public List<Race> getRaces() {
-//        return races;
-//    }
+//Up to here
     
 }
 @Component
